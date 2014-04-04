@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <!-- suppress a bunch of things for test files -->
+    <suppress files=".*Test\.java$" checks="AbstractClassName" />
+    <suppress files=".*Test\.java$" checks="AvoidStaticImport" />
+    <suppress files=".*Test\.java$" checks="DeclarationOrder" />
+    <suppress files=".*Test\.java$" checks="DesignForExtension" />
+    <suppress files=".*Test\.java$" checks="FinalLocalVariable" />
+    <suppress files=".*Test\.java$" checks="FinalParameters" />
+    <suppress files=".*Test\.java$" checks="Javadoc.*" />
+    <suppress files=".*Test\.java$" checks="MagicNumber" />
+    <suppress files=".*Test\.java$" checks="LineLength" />
+    <suppress files=".*Test\.java$" checks="MethodName" />
+    <suppress files=".*Test\.java$" checks="MemberName.*" />
+    <suppress files=".*Test\.java$" checks="MultipleStringLiterals" />
+    <suppress files=".*Test\.java$" checks="VisibilityModifier" />
+
+    <!-- suppress everything for JAXB -->
+    <suppress files="[/\\]jaxb[/\\]" checks="." />
+    
+    <!-- suppress JavaDocs for methods in beans, usually self-explanatory -->
+    <suppress files=".*Bean\.java$" checks="JavadocMethod" />
+</suppressions>

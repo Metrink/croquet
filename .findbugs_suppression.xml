@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<FindBugsFilter>
+    <!-- This prevents the unit tests from being tested -->
+    <Match>
+        <Class name=".*Test" />
+    </Match>
+</FindBugsFilter>
