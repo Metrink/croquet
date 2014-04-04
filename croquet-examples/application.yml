@@ -1,0 +1,35 @@
+current-user: Joe User
+mail-server: mail.example.com
+mail-user: test-user
+mail-pass: test-pass
+
+css_resources:
+    - style.css
+    - style-2.css
+    - //netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
+
+js_resources:
+    - script.js
+    - script-2.js
+    - //netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js
+
+port: 8080
+
+development: true
+
+db:
+    #persistence-unit: croquet-example
+    driver: org.hsqldb.jdbcDriver
+    jdbc_url: jdbc:hsqldb:file:db/crm
+    user: SA
+    pass:
+ 
+logging:
+    loggers:
+        "com.metrink.croquet": DEBUG
+        "org.hibernate": WARN
+    file:
+        enabled: true
+        currentLogFilename: ./croquet.log
+        archivedLogFilenamePattern: ./croquet-%d.log.gz
+ 

@@ -1,0 +1,5 @@
+/target
+/croquet*.log
+/croquet*.log.gz
+/db/crm.tmp
+/croquet.pid
