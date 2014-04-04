@@ -4,7 +4,7 @@
   <parent>
     <artifactId>croquet</artifactId>
     <groupId>com.metrink.croquet</groupId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>croquet-examples</artifactId>
