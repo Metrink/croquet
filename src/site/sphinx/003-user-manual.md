@@ -14,7 +14,7 @@ The following sections will explain all the configuration options in detail. If 
 
 ## Creating an Application Specific Configuration File
 
-Application specific configuration files can easily be created by extending the ``Settings`` class. Properties are added using the (not very intuative) ``@JsonProperty`` annotation. For example, to add a new setting called ``server`` you would simply add the following code to your settings class:
+Application specific configuration files can easily be created by extending the ``Settings`` class. Properties are added using the (not very intuitive) ``@JsonProperty`` annotation. For example, to add a new setting called ``server`` you would simply add the following code to your settings class:
 
 ```
 @JsonProperty("server")
@@ -70,7 +70,7 @@ Resources can also be added via the ``CroquetBuilder`` class's ``addResource(fin
 
 ### Fine Grain Control
 
-Normally you will want to set Croquet into either development mode or deployment mode and forget about the details. However, in some cases it can be useful to have more fine grain control over the different aspects of development vs deployment mode. Croquet enables this through a series of settings controled by the YAML file:
+Normally you will want to set Croquet into either development mode or deployment mode and forget about the details. However, in some cases it can be useful to have more fine grain control over the different aspects of development vs deployment mode. Croquet enables this through a series of settings controlled by the YAML file:
 
 - ``minify_resources``: false in development mode
 - ``strip_wicket_tags``: false in development mode
@@ -83,7 +83,7 @@ To override the default, simply specify the setting in the YAML file. Be careful
 
 Jetty is configured via the application's YAML file. Jetty only has one configuration option: the port it listens for connections on.
 
-By default Jetty is configured with Wicket's ``Jetty9WebSocketFilter``, so you can use Web Sockets in Corquet. Jetty is also configured with a Guice and a Hibernate filter. Hibernate sessions are created with every request (when a database is configured). Jetty is also configured so that you will never see that annoying ``JSESSIONID`` parameter in any of your URLs.
+By default Jetty is configured with Wicket's ``Jetty9WebSocketFilter``, so you can use Web Sockets in Croquet. Jetty is also configured with a Guice and a Hibernate filter. Hibernate sessions are created with every request (when a database is configured). Jetty is also configured so that you will never see that annoying ``JSESSIONID`` parameter in any of your URLs.
 
 If any of the Jetty configuration options do not meet your needs, they can be changed by overriding the ``configureJetty(final int port)`` method in the ``Croquet`` class.
 
@@ -127,16 +127,16 @@ logging:
 
 ## Adding Guice Modules
 
-Guice is weaved throughout Croquet. There are very few things that are instanciated inside of Croquet without using Guice, and this should be carried through your application as well. With Croquet, Guice constructs every page of your application. This means you can **and should** inject all dependencies into the constructor of each page.
+Guice is weaved throughout Croquet. There are very few things that are instantiated inside of Croquet without using Guice, and this should be carried through your application as well. With Croquet, Guice constructs every page of your application. This means you can **and should** inject all dependencies into the constructor of each page.
 
-> Note: Avoid field injection at all costs! It makes things **MUCH** harder to unit test. With Croquet, Guice is constructing every page, so there is no reason to use field injection. (See exceptions in the Overrview section.)
+> Note: Avoid field injection at all costs! It makes things **MUCH** harder to unit test. With Croquet, Guice is constructing every page, so there is no reason to use field injection. (See exceptions in the Overview section.)
 
-Croquet will **only** accpect two types of page constructors:
+Croquet will **only** accept two types of page constructors:
 
 1. Constructors with only dependencies that are ``@Injected``.
 2. Constructors with dependencies that are ``@Injected`` and a ``PageParameters`` parameter.
 
-Because of this, parameters that must be passed from page-to-page should be done via parameters (with the exception of sensitive information). This not only makes your application easier to bookmark (all the needed parameters for a page are in the URL), but it also severly reduces the size of the session, reducing the overall memory of your application. This does come at the cost of having to strictly verify all page parameters as they might have been changed/set by a malicious users. We think the tradeoff is worth it which is why passing objects to pages in Croquet is prohibited.
+Because of this, parameters that must be passed from page-to-page should be done via parameters (with the exception of sensitive information). This not only makes your application easier to bookmark (all the needed parameters for a page are in the URL), but it also severely reduces the size of the session, reducing the overall memory of your application. This does come at the cost of having to strictly verify all page parameters as they might have been changed/set by a malicious users. We think the trade-off is worth it which is why passing objects to pages in Croquet is prohibited.
 
 > Note: You can always store objects in the session; however, this comes at a larger memory cost.
 

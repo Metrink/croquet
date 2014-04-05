@@ -6,7 +6,7 @@ To get started with Croquet see the [Getting Started section](002-getting-starte
 
 ## Presentation
 
-Croquet was first introducted during an ApacheCon presentation. The [slides](https://docs.google.com/presentation/d/1m3jdbpYoSBOCPz8Wes9mPvhf8TLp_3dndj_gW08iFL8/edit?usp=sharing) from the "launch" [presentation](http://sched.co/1pav4JP) of Croquet give a good overview of what Croquet is and how it was built. 
+Croquet was first introduced during an ApacheCon presentation. The [slides](https://docs.google.com/presentation/d/1m3jdbpYoSBOCPz8Wes9mPvhf8TLp_3dndj_gW08iFL8/edit?usp=sharing) from the "launch" [presentation](http://sched.co/1pav4JP) of Croquet give a good overview of what Croquet is and how it was built. 
 
 
 ## Source
@@ -20,9 +20,9 @@ To make developing Wicket applications easier, Croquet adopts a few philosophies
 
 ### Dependency Injection
 
-Croquet **strongly** favors dependency injection via the constructor. Because Wicket requires that all pages be serializable, dependency injection becomes more difficult than in other applications. For dependencies that are injected into pages that are **not** serializable, Croquet relies upon Wicket's IoC extension to construct proxy objects allowing the instances to be serialized. (You should always try and make all dependencies serializable to prevent this overhead.) As a consequence of this, Croquet requires that all dependencies that are **not** serializable be injected via field injection. However, it is recommened that these dependencies also be injected via the constructor. (How do you do that, just mark both the constructor and field with ``@Inject``, then call ``Injector.get().inject(this)`` in the constructor.)
+Croquet **strongly** favors dependency injection via the constructor. Because Wicket requires that all pages be serializable, dependency injection becomes more difficult than in other applications. For dependencies that are injected into pages that are **not** serializable, Croquet relies upon Wicket's IoC extension to construct proxy objects allowing the instances to be serialized. (You should always try and make all dependencies serializable to prevent this overhead.) As a consequence of this, Croquet requires that all dependencies that are **not** serializable be injected via field injection. However, it is recommended that these dependencies also be injected via the constructor. (How do you do that, just mark both the constructor and field with ``@Inject``, then call ``Injector.get().inject(this)`` in the constructor.)
 
-So why not just use field injection for everything? Field injection makes writing unit tests more difficult, and afterall unit tests are one of the main reasons to use dependency injection in the first place. To aid in writing unit tests, Croquet is built so that every page inject its dependencies via a single constructors. For example, you would have the following:
+So why not just use field injection for everything? Field injection makes writing unit tests more difficult, and after all unit tests are one of the main reasons to use dependency injection in the first place. To aid in writing unit tests, Croquet is built so that every page inject its dependencies via a single constructors. For example, you would have the following:
 
 ```
 public class MyPage extends WebPage {

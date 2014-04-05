@@ -18,7 +18,7 @@ That's it! Croquet will bring in the proper versions of Wicket, Jetty, Hibernate
 
 ## Configuration
 
-Croquet is configured through a YAML file and via code. This may seem confusing at first as there are two places to look for configurations; however, we felt that some configurations are just easier (for example when needing to specify full classpaths) through code. Also, Guice is inherenty configured via code, and we didn't want to reinvent the wheel by making Guice configurable via a file.
+Croquet is configured through a YAML file and via code. This may seem confusing at first as there are two places to look for configurations; however, we felt that some configurations are just easier (for example when needing to specify full classpaths) through code. Also, Guice is inherently configured via code, and we didn't want to reinvent the wheel by making Guice configurable via a file.
 
 Why have a file at all then? Simply because when you're changing environments (from staging to production for example), it's very easy to change the file Croquet runs with. So we've put those things you might want to change from environment to environment (database, log level, etc) into the YAML file, and those things that aren't likely to change (home page, Guice modules) are configured via code.
 
@@ -52,7 +52,7 @@ pid_file: croquet.pid
 development: true
 
 db:
-    # persistence-unit: croquet-example # uncomment this, and comment the lines below to ues a persistence.xml file
+    # persistence-unit: croquet-example # uncomment this, and comment the lines below to use a persistence.xml file
     driver: org.hsqldb.jdbcDriver
     jdbc_url: jdbc:hsqldb:file:db/crm
     user: SA
@@ -150,7 +150,7 @@ You might find you need to add transformers to the shade configuration to remove
 Running a Croquet application that is bundled into a single JAR is as easy as:
 
 ```
-java -jar croquet-exmaple.jar application.yml
+java -jar croquet-example.jar application.yml
 ```
 
 Because everything is packaged into a single JAR, you do not need to fuss with classpaths. The desired configuration file is passed as a command line argument to your Croquet application. This makes it _very_ easy to change between configurations; simply pass a different YAML file.
