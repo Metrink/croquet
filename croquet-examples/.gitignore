@@ -3,3 +3,4 @@
 /croquet*.log.gz
 /db/crm.tmp
 /croquet.pid
+/dependency-reduced-pom.xml
