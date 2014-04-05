@@ -4,7 +4,7 @@
   <groupId>com.metrink.croquet</groupId>
   <artifactId>croquet</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>croquet</name>
   <url>http://croquet.metrink.com</url>
   <inceptionYear>2014</inceptionYear>
