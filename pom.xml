@@ -4,7 +4,7 @@
   <groupId>com.metrink.croquet</groupId>
   <artifactId>croquet</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>croquet</name>
   <url>http://croquet.metrink.com</url>
   <inceptionYear>2014</inceptionYear>
@@ -34,7 +34,7 @@
     <connection>scm:git:git://github.com/metrink/croquet.git</connection>
     <developerConnection>scm:git:git@github.com:metrink/croquet.git</developerConnection>
     <url>https://github.com/metrink/croquet</url>
-    <tag>HEAD</tag>
+    <tag>croquet-0.1.0</tag>
   </scm>
   <issueManagement>
     <system>GitHub</system>
@@ -201,7 +201,7 @@
         <version>2.7</version>
         <reportSets>
           <reportSet>
-            <reports/>
+            <reports />
           </reportSet>
         </reportSets>
       </plugin>
