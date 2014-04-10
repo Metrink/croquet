@@ -193,7 +193,7 @@ public class CroquetApplication extends AuthenticatedWebApplication {
 
     @Override
     protected Class<? extends AbstractAuthenticatedWebSession> getWebSessionClass() {
-        return UnauthenticatedWebSession.class;
+        return settings.getWicketSessionClass();
     }
 
     @Override
