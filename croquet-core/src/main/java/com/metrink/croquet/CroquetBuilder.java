@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.resource.IResource;
 import org.hibernate.dialect.Dialect;
@@ -138,6 +139,16 @@ public class CroquetBuilder<T extends Settings> {
         settings.setWebApplicationClass(application);
         return this;
     }
+    
+    /**
+     * Sets the {@link AbstractAuthenticatedWebSession} for the application.
+     * @param wicketSessionClass the {@link AbstractAuthenticatedWebSession} class.
+     * @return the {@link CroquetBuilder}.
+     */
+    public CroquetBuilder<T> setWicketSessionClass(final Class<? extends AbstractAuthenticatedWebSession> wicketSessionClass) {
+        settings.setWicketSessionClass(wicketSessionClass);
+        return this;
+    }
 
     /**
      * Sets the class to use as the home page.
@@ -214,6 +225,19 @@ public class CroquetBuilder<T extends Settings> {
         }
 
         settings.getDatabaseSettings().addEntity(entity);
+        return this;
+    }
+    
+    /**
+     * Adds a property to the database configuration.
+     * 
+     * <b>Only used when configuring the DB via the YAML file.</b>
+     * @param property the DB property to set.
+     * @param value the value of the property.
+     * @return the {@link CroquetBuilder}.
+     */
+    public CroquetBuilder<T> addDbProperty(final String property, final Object value) {
+        settings.getDatabaseSettings().addProperty(property, value);
         return this;
     }
 

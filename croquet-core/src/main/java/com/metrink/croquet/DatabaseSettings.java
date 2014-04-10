@@ -3,6 +3,7 @@ package com.metrink.croquet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.hibernate.dialect.Dialect;
 
@@ -39,7 +40,9 @@ public class DatabaseSettings implements Serializable {
     @JsonProperty("dialect")
     private String dialectClass;
 
-    private List<Class<? extends Serializable>> entities = new ArrayList<>();
+    private final List<Class<? extends Serializable>> entities = new ArrayList<>();
+    
+    private final Properties properties = new Properties();
 
     DatabaseSettings() {
         notUsed = false;
@@ -115,5 +118,9 @@ public class DatabaseSettings implements Serializable {
 
     void addEntity(final Class<? extends Serializable> entity) {
         this.entities.add(entity);
+    }
+    
+    void addProperty(final String property, final Object value) {
+        this.properties.put(property, value);
     }
 }

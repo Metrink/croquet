@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Url;
@@ -22,6 +23,7 @@ import ch.qos.logback.classic.Level;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metrink.croquet.wicket.CroquetApplication;
+import com.metrink.croquet.wicket.CroquetApplication.UnauthenticatedWebSession;
 
 /**
  * Base Settings class. Overriding this is not required, but it is recommended.
@@ -55,6 +57,8 @@ public class Settings implements Serializable {
     private Class<? extends WebPage> loginPage;
 
     private Class<? extends WebPage> exceptionPage;
+    
+    private Class<? extends AbstractAuthenticatedWebSession> wicketSessionClass = UnauthenticatedWebSession.class;
 
     private Map<String, Class<? extends WebPage>> pageMounts = new HashMap<>();
 
@@ -164,6 +168,19 @@ public class Settings implements Serializable {
 
     void setWebApplicationClass(final Class<? extends CroquetApplication> application) {
         this.application = application;
+    }
+    
+    /**
+     * Gets the {@link AbstractAuthenticatedWebSession} for this application.
+     * Defaults to {@link UnauthenticatedWebSession}.
+     * @return the session class.
+     */
+    public Class<? extends AbstractAuthenticatedWebSession> getWicketSessionClass() {
+        return wicketSessionClass;
+    }
+    
+    void setWicketSessionClass(final Class<? extends AbstractAuthenticatedWebSession> wicketSessionClass) {
+        this.wicketSessionClass = wicketSessionClass;
     }
 
     /**
