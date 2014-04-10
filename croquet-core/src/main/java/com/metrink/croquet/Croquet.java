@@ -82,11 +82,13 @@ public class Croquet<T extends Settings> {
         } else if(settings.getDatabaseSettings().getPersistenceUnit() == null) {
             LOG.info("Using YAML file to configure Hibernate");
             final DataSource dataSource = new DataSource();
+            final DatabaseSettings dbSettings = settings.getDatabaseSettings();
 
-            dataSource.setDriverClassName(settings.getDatabaseSettings().getDriver());
-            dataSource.setUrl(settings.getDatabaseSettings().getJdbcUrl());
-            dataSource.setUsername(settings.getDatabaseSettings().getUser());
-            dataSource.setPassword(settings.getDatabaseSettings().getPass());
+            dataSource.setDriverClassName(dbSettings.getDriver());
+            dataSource.setUrl(dbSettings.getJdbcUrl());
+            dataSource.setUsername(dbSettings.getUser());
+            dataSource.setPassword(dbSettings.getPass());
+            dataSource.setDbProperties(dbSettings.getProperties());
 
             guiceModules.add(new DataSourceHibernateModule(dataSource));
         } else {

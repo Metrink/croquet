@@ -120,6 +120,14 @@ public class DatabaseSettings implements Serializable {
         this.entities.add(entity);
     }
     
+    /**
+     * Returns the database properties.
+     * @return the database properties.
+     */
+    public Properties getProperties() {
+        return this.properties;
+    }
+    
     void addProperty(final String property, final Object value) {
         this.properties.put(property, value);
     }
