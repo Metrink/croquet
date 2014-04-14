@@ -75,6 +75,9 @@ class EntityManagerProxyFactory {
          * @param instance the original instance of the class.
          */
         public EntityManagerInterceptor(final HibernateEntityManagerFactory factory) {
+            if(factory == null) {
+                throw new IllegalArgumentException("HibernateEntityManagerFactory is null");
+            }
             this.factory = factory;
         }
 

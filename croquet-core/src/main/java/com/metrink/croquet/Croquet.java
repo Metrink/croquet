@@ -184,8 +184,27 @@ public class Croquet<T extends Settings> {
     public void run() {
         status = CroquetStatus.STARTING;
 
-        // create the injector and start the modules
+        // create the injector
         createInjector();
+
+        // configure the Jetty server
+        jettyServer = configureJetty(settings.getPort());
+
+        // start the server
+        try {
+            jettyServer.start();
+        //CHECKSTYLE:OFF the only exception that is thrown
+        } catch (final Exception e) {
+        //CHECKSTYLE:ON
+            LOG.error("Error starting Jetty: {}", e.getMessage(), e);
+
+            System.err.println("Error starting Jetty: " + e.getMessage());
+            System.exit(-1);
+
+            throw new RuntimeException(e); // throw this so the whole app stops
+        }
+
+        // create and start the modules
         final List<ManagedModule> managedModuleInstances = createAndStartModules();
 
         // install the shutdown hook
@@ -215,9 +234,7 @@ public class Croquet<T extends Settings> {
 
         });
 
-        // configure the Jetty server
-        jettyServer = configureJetty(settings.getPort());
-
+        // add a life-cycle listener to remove drop the PID
         jettyServer.addLifeCycleListener(new AbstractLifeCycleListener() {
             @Override
             public void lifeCycleStarted(final LifeCycle event) {
@@ -235,20 +252,6 @@ public class Croquet<T extends Settings> {
                 }
             }
         });
-
-        // start the server
-        try {
-            jettyServer.start();
-        //CHECKSTYLE:OFF the only exception that is thrown
-        } catch (final Exception e) {
-        //CHECKSTYLE:ON
-            LOG.error("Error starting Jetty: {}", e.getMessage(), e);
-
-            System.err.println("Error starting Jetty: " + e.getMessage());
-            System.exit(-1);
-
-            throw new RuntimeException(e); // throw this so the whole app stops
-        }
 
         status = CroquetStatus.RUNNING;
 
