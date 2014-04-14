@@ -193,6 +193,8 @@ public class CroquetApplication extends AuthenticatedWebApplication {
 
     @Override
     protected Class<? extends AbstractAuthenticatedWebSession> getWebSessionClass() {
+        // Wicket needs to be fixed: https://issues.apache.org/jira/browse/WICKET-5557
+        //return settings.getWicketSessionClass();
         return UnauthenticatedWebSession.class;
     }
 
