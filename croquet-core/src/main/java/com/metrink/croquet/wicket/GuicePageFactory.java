@@ -19,7 +19,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.ProvisionException;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import com.metrink.croquet.Settings;
@@ -71,7 +70,7 @@ public class GuicePageFactory implements IPageFactory {
             }).getInstance(pageClass);
 
             return pageInstance;
-        } catch(final ConfigurationException | ProvisionException e) {
+        } catch(final ConfigurationException e) {
             LOG.debug("Could not create page {} through Guice, trying manually: {}", pageClass, e.getMessage());
 
             return createOrThrow(pageClass, null);
@@ -97,12 +96,8 @@ public class GuicePageFactory implements IPageFactory {
             LOG.debug("Could not create page {} through Guice, trying manually", pageClass);
 
             return createOrThrow(pageClass, parameters);
-        } catch(final ProvisionException e) {
-            LOG.error("Error creating page {} with Guice", pageClass, e);
-
-            throw new WicketRuntimeException(e);
         }
-    }
+}
 
     private <C extends IRequestablePage> C createOrThrow(final Class<C> pageClass, final PageParameters parameters) {
         try {
