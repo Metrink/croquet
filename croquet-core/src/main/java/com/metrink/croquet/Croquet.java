@@ -58,6 +58,7 @@ public class Croquet<T extends Settings> {
 
     private final T settings;
     private Server jettyServer;
+    private final ServletContextHandler sch;
 
     /**
      * Constructs a Croquet instance given the arguments pass into the program. The {@link Settings} type T is passed
@@ -68,6 +69,8 @@ public class Croquet<T extends Settings> {
      */
     Croquet(final Class<T> clazz, final T settings) {
         this.settings = settings;
+
+        sch = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
         // add the croquet module to our list of guice modules
         guiceModules.add(new CroquetModule<T>(clazz, settings));
@@ -279,6 +282,14 @@ public class Croquet<T extends Settings> {
     }
 
     /**
+     * Gets the {@link ServletContextHandler} for Jetty.
+     * @return the {@link ServletContextHandler} Jetty uses.
+     */
+    public ServletContextHandler getServletContextHandler() {
+        return sch;
+    }
+
+    /**
      * Function used to configure Jetty and return a Server instance.
      * @param port the port to run Jetty on.
      * @return the {@link Server} instance.
@@ -293,8 +304,6 @@ public class Croquet<T extends Settings> {
         connector.setPort(port);
 
         server.addConnector(connector);
-
-        final ServletContextHandler sch = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
         // set the injector as an attribute in the context
         sch.setAttribute("guice-injector", injector);
@@ -334,9 +343,6 @@ public class Croquet<T extends Settings> {
         // add the default servlet as Guice & Wicket will take care of everything for us
         sch.addServlet(DefaultServlet.class,  "/*");
 
-//        sch.setErrorHandler(new MetrinkErrorHandler());
-
-//        server.setHandler(new ServletContextHandler(ServletContextHandler.SESSIONS));
         server.setHandler(sch);
 
         return server;

@@ -93,7 +93,7 @@ public class GuicePageFactory implements IPageFactory {
 
             return pageInstance;
         } catch(final ConfigurationException e) {
-            LOG.debug("Could not create page {} through Guice, trying manually", pageClass);
+            LOG.debug("Could not create page {} through Guice, trying manually: {}", pageClass, e.getMessage());
 
             return createOrThrow(pageClass, parameters);
         }
