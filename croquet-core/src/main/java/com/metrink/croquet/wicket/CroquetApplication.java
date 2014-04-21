@@ -76,7 +76,7 @@ public class CroquetApplication extends AuthenticatedWebApplication {
         super.init();
 
         // this is a bit of a hack to get the DebugToolbar working in deployment mode
-        if(settings.getWicketDebugToolbar() && !settings.getDevelopment()) {
+        if(settings.getWicketDebugToolbar() && settings.getDevelopment()) {
             getDebugSettings().setDevelopmentUtilitiesEnabled(settings.getWicketDebugToolbar());
             DebugBar.registerContributor(VersionDebugContributor.DEBUG_BAR_CONTRIB, this);
             DebugBar.registerContributor(InspectorDebugPanel.DEBUG_BAR_CONTRIB, this);
@@ -123,8 +123,8 @@ public class CroquetApplication extends AuthenticatedWebApplication {
             });
         }
 
-        // set the exception page if we're in development and it's set
-        if(settings.getDevelopment() && settings.getExceptionPage() != null) {
+        // set the exception page if we're in deployment and it's set
+        if(!settings.getDevelopment() && settings.getExceptionPage() != null) {
             this.getRequestCycleListeners().add(new AbstractRequestCycleListener() {
                 @Override
                 public IRequestHandler onException(final RequestCycle cycle, final Exception e) {
