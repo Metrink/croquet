@@ -92,7 +92,6 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
         //
         // We'll want to map these to settings
         //
-        configuration.setProperty(AvailableSettings.AUTO_CLOSE_SESSION, TRUE_STRING);
         configuration.setProperty(AvailableSettings.CURRENT_SESSION_CONTEXT_CLASS, "managed");
         configuration.setProperty(AvailableSettings.USE_GET_GENERATED_KEYS, TRUE_STRING);
         configuration.setProperty(AvailableSettings.USE_REFLECTION_OPTIMIZER, TRUE_STRING);
