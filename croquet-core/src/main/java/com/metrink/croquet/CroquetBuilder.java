@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.metrink.croquet.LoggingSettings.LogFile;
 import com.metrink.croquet.logging.CroquetLoggingFactory;
 import com.metrink.croquet.wicket.CroquetApplication;
 
@@ -96,6 +97,7 @@ public class CroquetBuilder<T extends Settings> {
      */
     public Croquet<T> build() {
         checkDbSettings();
+        checkLoggingSettings();
 
         return new Croquet<T>(settingsClass, settings);
     }
@@ -106,11 +108,15 @@ public class CroquetBuilder<T extends Settings> {
      */
     public CroquetTester<T> buildTester() {
         checkDbSettings();
+        checkLoggingSettings();
 
         return new CroquetTester<T>(settingsClass, settings);
     }
 
-    private void checkDbSettings() {
+    /**
+     * Runs checks over the database settings before building a {@link Croquet} instance.
+     */
+    protected void checkDbSettings() {
         final DatabaseSettings db = settings.getDatabaseSettings();
 
         if(db == null) {
@@ -131,6 +137,24 @@ public class CroquetBuilder<T extends Settings> {
     }
 
     /**
+     * Runs some checks over the log settings before building a {@link Corquet} instance.
+     */
+    protected void checkLoggingSettings() {
+        final LoggingSettings logSettings = settings.getLoggingSettings();
+        final LogFile logFileSettings = logSettings.getLogFile();
+
+        if(logFileSettings.getCurrentLogFilename() != null &&
+           logFileSettings.isEnabled() == false) {
+            LOG.warn("You specified a log file, but have it disabled");
+        }
+
+        if(logFileSettings.isEnabled() &&
+           logFileSettings.getCurrentLogFilename() == null) {
+            throw new IllegalStateException("You enabled logging to a file, but didn't specify the file name");
+        }
+    }
+
+    /**
      * Sets the class of the Wicket application.
      * @param application the WebApplication class for Wicket.
      * @return the {@link CroquetBuilder}.
@@ -139,7 +163,7 @@ public class CroquetBuilder<T extends Settings> {
         settings.setWebApplicationClass(application);
         return this;
     }
-    
+
     /**
      * Sets the {@link AbstractAuthenticatedWebSession} for the application.
      * @param wicketSessionClass the {@link AbstractAuthenticatedWebSession} class.
@@ -227,10 +251,10 @@ public class CroquetBuilder<T extends Settings> {
         settings.getDatabaseSettings().addEntity(entity);
         return this;
     }
-    
+
     /**
      * Adds a property to the database configuration.
-     * 
+     *
      * <b>Only used when configuring the DB via the YAML file.</b>
      * @param property the DB property to set.
      * @param value the value of the property.
