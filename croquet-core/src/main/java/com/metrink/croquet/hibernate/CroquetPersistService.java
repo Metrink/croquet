@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -55,7 +56,7 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
         this.persistenceUnitName = persistenceUnitName;
         this.connectionProvider = connectionProvider;
     }
-    
+
     public String getPersistenceUnitName() {
         return persistenceUnitName;
     }
@@ -91,6 +92,7 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
         //
         // We'll want to map these to settings
         //
+        configuration.setProperty(AvailableSettings.AUTO_CLOSE_SESSION, TRUE_STRING);
         configuration.setProperty(AvailableSettings.CURRENT_SESSION_CONTEXT_CLASS, "managed");
         configuration.setProperty(AvailableSettings.USE_GET_GENERATED_KEYS, TRUE_STRING);
         configuration.setProperty(AvailableSettings.USE_REFLECTION_OPTIMIZER, TRUE_STRING);
@@ -169,6 +171,13 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
         // Let's not penalize users for calling end() multiple times.
         if (null == em) {
           return;
+        }
+
+        final EntityTransaction tx = em.getTransaction();
+
+        if(tx.isActive()) {
+            LOG.warn("There was an active transaction at the end of a request");
+            tx.commit();
         }
 
         em.close();
