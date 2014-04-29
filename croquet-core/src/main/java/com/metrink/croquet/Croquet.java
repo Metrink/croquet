@@ -193,6 +193,25 @@ public class Croquet<T extends Settings> {
         // configure the Jetty server
         jettyServer = configureJetty(settings.getPort());
 
+        // add a life-cycle listener to remove drop the PID
+        jettyServer.addLifeCycleListener(new AbstractLifeCycleListener() {
+            @Override
+            public void lifeCycleStarted(final LifeCycle event) {
+                final String pidFile = settings.getPidFile();
+
+                // when a pid-file is configured, drop it upon successfully binding to the port.
+                if (pidFile != null) {
+                    LOG.info("Dropping PID file: {}", pidFile);
+
+                    // the PidManager will automatically remove the pid file on shutdown
+                    new PidManager(pidFile).dropPidOrDie();
+                } else {
+                    LOG.warn("No PID file specified, so not file will be dropped. " +
+                            "Set a file via code or in the config file to drop a pid file.");
+                }
+            }
+        });
+
         // start the server
         try {
             jettyServer.start();
@@ -235,25 +254,6 @@ public class Croquet<T extends Settings> {
                 LOG.info("Croquet has stopped");
             }
 
-        });
-
-        // add a life-cycle listener to remove drop the PID
-        jettyServer.addLifeCycleListener(new AbstractLifeCycleListener() {
-            @Override
-            public void lifeCycleStarted(final LifeCycle event) {
-                final String pidFile = settings.getPidFile();
-
-                // when a pid-file is configured, drop it upon successfully binding to the port.
-                if (pidFile != null) {
-                    LOG.info("Dropping PID file: {}", pidFile);
-
-                    // the PidManager will automatically remove the pid file on shutdown
-                    new PidManager(pidFile).dropPidOrDie();
-                } else {
-                    LOG.warn("No PID file specified, so not file will be dropped. " +
-                            "Set a file via code or in the config file to drop a pid file.");
-                }
-            }
         });
 
         status = CroquetStatus.RUNNING;
