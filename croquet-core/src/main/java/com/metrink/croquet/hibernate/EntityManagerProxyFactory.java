@@ -135,6 +135,10 @@ class EntityManagerProxyFactory {
             LOG.trace("Creating wrapper for an EntityManager");
 
             if(entityManager != null && entityManager.isOpen()) {
+                if(entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().commit();
+                }
+
                 // make sure we close our transactions
                 entityManager.close();
                 entityManager = null;
