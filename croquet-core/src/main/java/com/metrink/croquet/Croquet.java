@@ -34,6 +34,8 @@ import com.metrink.croquet.hibernate.PersistanceUnitHibernateModule;
 import com.metrink.croquet.inject.CroquetModule;
 import com.metrink.croquet.modules.ManagedModule;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * This is the main class of Croquet.
  *
@@ -186,7 +188,7 @@ public class Croquet<T extends Settings> {
     /**
      * Starts the Croquet framework.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_EXIT")
+    @SuppressFBWarnings("DM_EXIT")
     public void run() {
         status = CroquetStatus.STARTING;
 

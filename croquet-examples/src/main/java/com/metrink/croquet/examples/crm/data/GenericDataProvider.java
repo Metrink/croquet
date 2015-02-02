@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * A generic {@link SortableDataProvider} that reads from a DB through an {@link EntityManager}.
  *
@@ -29,7 +31,7 @@ public class GenericDataProvider<T extends Serializable> extends SortableDataPro
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericDataProvider.class);
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
+    @SuppressFBWarnings("SE_BAD_FIELD")
     private final EntityManager entityManager;
     private final Class<T> type;
 

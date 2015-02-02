@@ -3,8 +3,6 @@ package com.metrink.croquet.examples.crm.pages;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.metrink.croquet.CroquetTester;
 import com.metrink.croquet.examples.crm.CrmModule;
@@ -13,7 +11,7 @@ import com.metrink.croquet.examples.crm.EmailModule;
 import com.metrink.croquet.examples.crm.Main;
 
 public class CompanyPageTest {
-    private static final Logger LOG = LoggerFactory.getLogger(CompanyPageTest.class);
+    //private static final Logger LOG = LoggerFactory.getLogger(CompanyPageTest.class);
 
     private WicketTester tester;
 
