@@ -92,6 +92,9 @@ public class Croquet<T extends Settings> {
             dataSource.setUsername(dbSettings.getUser());
             dataSource.setPassword(dbSettings.getPass());
             dataSource.setDbProperties(dbSettings.getProperties());
+            dataSource.setTestOnBorrow(true);
+            dataSource.setTestWhileIdle(true);
+            dataSource.setValidationQuery("select 1");
 
             guiceModules.add(new DataSourceHibernateModule(dataSource));
         } else {
