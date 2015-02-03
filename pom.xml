@@ -347,6 +347,11 @@
         <artifactId>tomcat-jdbc</artifactId>
         <version>8.0.18</version>
       </dependency>
+      <dependency>
+        <groupId>com.sop4j</groupId>
+        <artifactId>dbutils</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
       <!-- Guice DI -->
       <dependency>
         <groupId>com.google.inject.extensions</groupId>

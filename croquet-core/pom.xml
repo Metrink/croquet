@@ -162,6 +162,10 @@
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-jdbc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.sop4j</groupId>
+      <artifactId>dbutils</artifactId>
+    </dependency>
     <!-- Guice DI -->
     <dependency>
       <groupId>com.google.inject.extensions</groupId>

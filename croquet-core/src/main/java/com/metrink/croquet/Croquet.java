@@ -31,6 +31,7 @@ import com.google.inject.persist.PersistFilter;
 import com.google.inject.util.Providers;
 import com.metrink.croquet.hibernate.DataSourceHibernateModule;
 import com.metrink.croquet.hibernate.PersistanceUnitHibernateModule;
+import com.metrink.croquet.hibernate.QueryRunnerModule;
 import com.metrink.croquet.inject.CroquetModule;
 import com.metrink.croquet.modules.ManagedModule;
 
@@ -99,6 +100,7 @@ public class Croquet<T extends Settings> {
             dataSource.setValidationQuery("select 1");
 
             guiceModules.add(new DataSourceHibernateModule(dataSource));
+            guiceModules.add(new QueryRunnerModule(dataSource));
         } else {
             LOG.info("Using persistence.xml file to configure Hibernate");
 
