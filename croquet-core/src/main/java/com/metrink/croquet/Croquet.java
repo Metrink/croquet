@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.DispatcherType;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.wicket.guice.GuiceWebApplicationFactory;
 import org.apache.wicket.protocol.http.WicketFilter;
 import org.apache.wicket.protocol.ws.jetty9.Jetty9WebSocketFilter;
@@ -87,20 +86,11 @@ public class Croquet<T extends Settings> {
                     "If you get an error about no binding for an EntityManager, you need to configure a database.");
         } else if(settings.getDatabaseSettings().getPersistenceUnit() == null) {
             LOG.info("Using YAML file to configure Hibernate");
-            final DataSource dataSource = new DataSource();
-            final DatabaseSettings dbSettings = settings.getDatabaseSettings();
 
-            dataSource.setDriverClassName(dbSettings.getDriver());
-            dataSource.setUrl(dbSettings.getJdbcUrl());
-            dataSource.setUsername(dbSettings.getUser());
-            dataSource.setPassword(dbSettings.getPass());
-            dataSource.setDbProperties(dbSettings.getProperties());
-            dataSource.setTestOnBorrow(true);
-            dataSource.setTestWhileIdle(true);
-            dataSource.setValidationQuery("select 1");
+            final DataSourceFactory dataSourceFactory = new DataSourceFactory(settings.getDatabaseSettings());
 
-            guiceModules.add(new DataSourceHibernateModule(dataSource));
-            guiceModules.add(new QueryRunnerModule(dataSource));
+            guiceModules.add(new DataSourceHibernateModule(dataSourceFactory.getDataSource()));
+            guiceModules.add(new QueryRunnerModule(dataSourceFactory));
         } else {
             LOG.info("Using persistence.xml file to configure Hibernate");
 

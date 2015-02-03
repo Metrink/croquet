@@ -1,10 +1,8 @@
 package com.metrink.croquet.hibernate;
 
-import javax.sql.DataSource;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.util.Providers;
+import com.metrink.croquet.DataSourceFactory;
 import com.sop4j.dbutils.QueryRunner;
 
 /**
@@ -13,14 +11,14 @@ import com.sop4j.dbutils.QueryRunner;
 public class QueryRunnerModule extends AbstractModule {
     //private static final Logger LOG = LoggerFactory.getLogger(QueryRunnerModule.class);
 
-    private final DataSource dataSource;
+    private final DataSourceFactory dataSourceFactory;
 
     /**
-     * Constructor which takes a {@link DataSource}.
-     * @param dataSource the DataSource to use.
+     * Constructor.
+     * @param dataSourceFactory a factory to create {@link DataSource}s.
      */
-    public QueryRunnerModule(final DataSource dataSource) {
-        this.dataSource = dataSource;
+    public QueryRunnerModule(final DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
     }
 
     @Override
@@ -33,6 +31,6 @@ public class QueryRunnerModule extends AbstractModule {
      */
     @Provides
     public QueryRunner queryRunnerProvider() {
-        return QueryRunnerProxyFactory.createProxy(Providers.of(dataSource));
+        return QueryRunnerProxyFactory.createProxy(dataSourceFactory);
     }
 }

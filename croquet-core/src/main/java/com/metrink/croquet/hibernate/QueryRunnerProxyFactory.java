@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import javax.sql.DataSource;
-
 import net.sf.cglib.core.DefaultNamingPolicy;
 import net.sf.cglib.core.Predicate;
 import net.sf.cglib.proxy.Enhancer;
@@ -17,7 +15,7 @@ import org.apache.wicket.proxy.LazyInitProxyFactory.IWriteReplace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Provider;
+import com.metrink.croquet.DataSourceFactory;
 import com.sop4j.dbutils.QueryRunner;
 
 
@@ -32,11 +30,11 @@ public class QueryRunnerProxyFactory {
 
     /**
      * Creates a proxy object that will write-replace with a wrapper around a {@link QueryRunner}.
-     * @param dataSourceProvider a provider to generate DataSources.
+     * @param dataSourceFactory a provider to generate DataSources.
      * @return the proxied instance.
      */
-    public static QueryRunner createProxy(final Provider<DataSource> dataSourceProvider) {
-        final QueryRunnerInterceptor handler = new QueryRunnerInterceptor(dataSourceProvider);
+    public static QueryRunner createProxy(final DataSourceFactory dataSourceFactory) {
+        final QueryRunnerInterceptor handler = new QueryRunnerInterceptor(dataSourceFactory);
 
         final Enhancer e = new Enhancer();
 
@@ -69,15 +67,15 @@ public class QueryRunnerProxyFactory {
         private static final Logger LOG = LoggerFactory.getLogger(QueryRunnerInterceptor.class);
         private static final long serialVersionUID = 1L;
 
-        private final Provider<DataSource> dataSourceProvider;
+        private final DataSourceFactory dataSourceFactory;
         private transient QueryRunner queryRunner;
 
-        public QueryRunnerInterceptor(final Provider<DataSource> dataSourceProvider) {
-            if(dataSourceProvider == null) {
-                throw new IllegalArgumentException("DataSource provider is null");
+        public QueryRunnerInterceptor(final DataSourceFactory dataSourceFactory) {
+            if(dataSourceFactory == null) {
+                throw new IllegalArgumentException("ConnectionProvider provider is null");
             }
 
-            this.dataSourceProvider = dataSourceProvider;
+            this.dataSourceFactory = dataSourceFactory;
         }
 
         @Override
@@ -103,9 +101,7 @@ public class QueryRunnerProxyFactory {
             }
 
             if(queryRunner == null) {
-                final DataSource dataSource = dataSourceProvider.get();
-
-                queryRunner = new QueryRunner(dataSource);
+                queryRunner = new QueryRunner(dataSourceFactory.getDataSource());
             }
 
             return proxy.invoke(queryRunner, args);
@@ -135,7 +131,7 @@ public class QueryRunnerProxyFactory {
         public Object writeReplace() throws ObjectStreamException {
             LOG.trace("Creating wrapper for a QueryRunner");
 
-            return new QueryRunnerWrapper(dataSourceProvider);
+            return new QueryRunnerWrapper(dataSourceFactory);
         }
 
     }
@@ -146,14 +142,14 @@ public class QueryRunnerProxyFactory {
     private static class QueryRunnerWrapper implements Serializable {
 
         private static final long serialVersionUID = 1L;
-        private final Provider<DataSource> dataSourceProvider;
+        private final DataSourceFactory dataSourceFactory;
 
-        public QueryRunnerWrapper(final Provider<DataSource> dataSourceProvider) {
-            this.dataSourceProvider = dataSourceProvider;
+        public QueryRunnerWrapper(final DataSourceFactory dataSourceFactory) {
+            this.dataSourceFactory = dataSourceFactory;
         }
 
         private Object readResolve() throws ObjectStreamException {
-            return QueryRunnerProxyFactory.createProxy(dataSourceProvider);
+            return QueryRunnerProxyFactory.createProxy(dataSourceFactory);
         }
     }
 
