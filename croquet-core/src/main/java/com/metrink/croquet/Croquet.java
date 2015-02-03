@@ -89,7 +89,7 @@ public class Croquet<T extends Settings> {
 
             final DataSourceFactory dataSourceFactory = new DataSourceFactory(settings.getDatabaseSettings());
 
-            guiceModules.add(new DataSourceHibernateModule(dataSourceFactory.getDataSource()));
+            guiceModules.add(new DataSourceHibernateModule(dataSourceFactory));
             guiceModules.add(new QueryRunnerModule(dataSourceFactory));
         } else {
             LOG.info("Using persistence.xml file to configure Hibernate");
