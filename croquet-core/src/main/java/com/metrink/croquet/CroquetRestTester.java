@@ -18,12 +18,12 @@ import com.metrink.croquet.modules.ManagedModule;
  *
  * @param <T> The class used when loading the settings YAML
  */
-public class CroquetTester<T extends WicketSettings> extends CroquetWicket<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(CroquetTester.class);
+public class CroquetRestTester<T extends RestSettings> extends CroquetRest<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(CroquetRestTester.class);
 
     private WicketTester tester;
 
-    CroquetTester(final Class<T> clazz, final T settings) {
+    CroquetRestTester(final Class<T> clazz, final T settings) {
         super(clazz, settings);
     }
 

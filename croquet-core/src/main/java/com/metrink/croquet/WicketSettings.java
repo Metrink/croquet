@@ -1,6 +1,5 @@
 package com.metrink.croquet;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,10 +15,6 @@ import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.UrlResourceReference;
 import org.apache.wicket.settings.IRequestCycleSettings.RenderStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metrink.croquet.wicket.CroquetApplication;
@@ -30,26 +25,9 @@ import com.metrink.croquet.wicket.CroquetApplication.UnauthenticatedWebSession;
  *
  * Properties annotated with {@link JsonProperty} will be loaded from the YAML configuration file.
  */
-public class Settings implements Serializable {
+public class WicketSettings extends AbstractSettings {
     private static final long serialVersionUID = -4071324712275262138L;
-    private static final Logger LOG = LoggerFactory.getLogger(Settings.class);
-    private static final int DEFAULT_PORT = 8080;
 
-    /*
-     * Croquet General Settings
-     */
-    @JsonProperty("development")
-    private Boolean development = false;
-
-    /*
-     * Jetty Settings
-     */
-    @JsonProperty("port")
-    private Integer port = DEFAULT_PORT;
-
-    /*
-     * Wicket Settings
-     */
     private Class<? extends WebApplication> application = CroquetApplication.class;
 
     private Class<? extends WebPage> homePage;
@@ -57,7 +35,7 @@ public class Settings implements Serializable {
     private Class<? extends WebPage> loginPage;
 
     private Class<? extends WebPage> exceptionPage;
-    
+
     private Class<? extends AbstractAuthenticatedWebSession> wicketSessionClass = UnauthenticatedWebSession.class;
 
     private Map<String, Class<? extends WebPage>> pageMounts = new HashMap<>();
@@ -71,9 +49,6 @@ public class Settings implements Serializable {
 
     @JsonProperty("js_resources")
     private List<String> jsResources = new ArrayList<String>();
-
-    @JsonProperty("pid_file")
-    private String pidFile;
 
     /*
      * By default these settings are NULL and "inherit" from development (or not) mode.
@@ -91,71 +66,15 @@ public class Settings implements Serializable {
     @JsonProperty("wicket_debug_toolbar")
     private Boolean wicketDebugToolbar;
 
-    /*
-     * Logging settings
-     */
-    @JsonProperty("logging")
-    private LoggingSettings loggingSettings = new LoggingSettings();
 
-    /*
-     * Hibernate/DB settings
-     */
-    @JsonProperty("db")
-    private DatabaseSettings dbSettings;
-
-    /**
-     * Perform post de-serialization modification of the Settings.
-     */
-    protected void initialize() {
-
-        // Enabling development mode forces these settings. This is somewhat inelegant, because to configure one of
-        // these values differently will require disabling development mode and manually configure the remaining values.
-        if (development) {
+    @Override
+    protected void init() {
+        if (getDevelopment()) {
             minifyResources = false;
             stripWicketTags = false;
             statelessChecker = true;
             wicketDebugToolbar = true;
-
-            loggingSettings.getLoggers().put("org.hibernate.SQL", Level.DEBUG);
-            loggingSettings.getLoggers().put("com.metrink.croquet", Level.DEBUG);
         }
-    }
-
-    /**
-     * Helper method used to obtain a class from a fully qualified class name. If the value is null or an exception is
-     * thrown, return the default result instead.
-     * @param className the fully qualified class name to try
-     * @param defaultResult the nullable default result
-     * @param <T> the class type
-     * @return the class or null
-     */
-    @SuppressWarnings("unchecked")
-    protected <T> Class<T> getClassOrDefault(final String className, final Class<T> defaultResult) {
-        try {
-            return className == null
-                    ? defaultResult
-                    : (Class<T>)Class.forName(className);
-        } catch (final ClassNotFoundException e) {
-            LOG.error("ClassNotFoundException for {} - defaulting to {}", className, defaultResult);
-            return defaultResult;
-        }
-    }
-
-    /**
-     * Is Croquet in development mode? If true, reconfigure various settings on {@link #initialize()}. Defaults to false
-     * to avoid accidental deployment of development mode in production.
-     * @return true if in development mode
-     */
-    public Boolean getDevelopment() {
-        return development;
-    }
-
-    /**
-     * Get the TCP port which will be bound to Jetty.
-     * @return the port
-     */
-    public int getPort() {
-        return port;
     }
 
     /**
@@ -169,7 +88,7 @@ public class Settings implements Serializable {
     void setWebApplicationClass(final Class<? extends CroquetApplication> application) {
         this.application = application;
     }
-    
+
     /**
      * Gets the {@link AbstractAuthenticatedWebSession} for this application.
      * Defaults to {@link UnauthenticatedWebSession}.
@@ -178,7 +97,7 @@ public class Settings implements Serializable {
     public Class<? extends AbstractAuthenticatedWebSession> getWicketSessionClass() {
         return wicketSessionClass;
     }
-    
+
     void setWicketSessionClass(final Class<? extends AbstractAuthenticatedWebSession> wicketSessionClass) {
         this.wicketSessionClass = wicketSessionClass;
     }
@@ -321,7 +240,7 @@ public class Settings implements Serializable {
      * @return true if resources should be minified
      */
     public Boolean getMinifyResources() {
-        if(development) {
+        if(getDevelopment()) {
             return minifyResources != null ? minifyResources : false;
         } else {
             return minifyResources != null ? minifyResources : true;
@@ -333,7 +252,7 @@ public class Settings implements Serializable {
      * @return true if the tags sholud be stripped
      */
     public boolean getStripWicketTags() {
-        if(development) {
+        if(getDevelopment()) {
             return stripWicketTags != null ? stripWicketTags : false;
         } else {
             return stripWicketTags != null ? stripWicketTags : true;
@@ -345,7 +264,7 @@ public class Settings implements Serializable {
      * @return true if the stateless checker should be enabled
      */
     public Boolean getStatelessChecker() {
-        if(development) {
+        if(getDevelopment()) {
             return statelessChecker != null ? statelessChecker : true;
         } else {
             return statelessChecker != null ? statelessChecker : false;
@@ -360,7 +279,7 @@ public class Settings implements Serializable {
      * @return true if the wicket debug toolbar should be enabled
      */
     public Boolean getWicketDebugToolbar() {
-        if(development) {
+        if(getDevelopment()) {
             return wicketDebugToolbar != null ? wicketDebugToolbar : true;
         } else {
             return wicketDebugToolbar != null ? wicketDebugToolbar : false;
@@ -372,39 +291,7 @@ public class Settings implements Serializable {
      * @return the rendering strategy
      */
     public RenderStrategy getRenderStrategy() {
-        // TODO: Implement
         return RenderStrategy.ONE_PASS_RENDER;
     }
 
-    /**
-     * Get the {@link DatabaseSettings}.
-     * @return the {@link DatabaseSettings}.
-     */
-    public DatabaseSettings getDatabaseSettings() {
-        return dbSettings;
-    }
-
-    /**
-     * Get the {@link LoggingSettings}.
-     * @return the {@link LoggingSettings}.
-     */
-    public LoggingSettings getLoggingSettings() {
-        return loggingSettings;
-    }
-
-    /**
-     * Get pidFile.
-     * @return the pidFile
-     */
-    public String getPidFile() {
-        return pidFile;
-    }
-
-    /**
-     * Set pidFile.
-     * @param pidFile the pidFile to set
-     */
-    public void setPidFile(final String pidFile) {
-        this.pidFile = pidFile;
-    }
 }

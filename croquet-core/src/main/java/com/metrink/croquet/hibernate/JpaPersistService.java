@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.WicketSettings;
 
 /**
  * A PersistService that uses an EntityManager factory from a persistence.xml file.
@@ -20,13 +20,13 @@ class JpaPersistService extends CroquetPersistService {
 
     /**
      * Constructor.
-     * @param settings the settings from Croquet.
+     * @param wicketSettings the settings from Croquet.
      * @param persistenceUnitName the name of the persistence unit.
      */
     @Inject
-    public JpaPersistService(final Settings settings,
+    public JpaPersistService(final WicketSettings wicketSettings,
                              @Nullable @Named("jpa-unit-name") final String persistenceUnitName) {
-        super(settings, persistenceUnitName, null);
+        super(wicketSettings, persistenceUnitName, null);
     }
 
     @Override

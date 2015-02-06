@@ -4,9 +4,9 @@ import org.hibernate.dialect.HSQLDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.metrink.croquet.Croquet;
-import com.metrink.croquet.CroquetBuilder;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.CroquetWicket;
+import com.metrink.croquet.CroquetWicketBuilder;
+import com.metrink.croquet.WicketSettings;
 import com.metrink.croquet.examples.crm.data.CompanyBean;
 import com.metrink.croquet.examples.crm.data.PeopleBean;
 import com.metrink.croquet.examples.crm.pages.CompanyPage;
@@ -31,7 +31,7 @@ public class Main {
      */
     public static void main(final String[] args) {
         // create the croquet object through the builder
-        final Croquet<CrmSettings> croquet = configureBuilder(CrmSettings.class, args).build();
+        final CroquetWicket<CrmSettings> croquet = configureBuilder(CrmSettings.class, args).build();
 
         // get the custom settings for the application
         // if custom settings aren't needed for Guice modules, then you
@@ -52,14 +52,14 @@ public class Main {
     }
 
     /**
-     * This method is used to configure a {@link CroquetBuilder} as we use in here an in unit tests.
+     * This method is used to configure a {@link CroquetWicketBuilder} as we use in here an in unit tests.
      * @param clazz the settings class.
      * @param args the command line arguments.
      * @return a CroquetBuilder instance.
      * @param <S> the type of the settings.
      */
-    public static <S extends Settings> CroquetBuilder<S> configureBuilder(final Class<S> clazz, final String[] args) {
-        return CroquetBuilder.create(clazz, args)
+    public static <S extends WicketSettings> CroquetWicketBuilder<S> configureBuilder(final Class<S> clazz, final String[] args) {
+        return CroquetWicketBuilder.create(clazz, args)
             .setHomePageClass(PeoplePage.class)
             .addPageMount("/people", PeoplePage.class)
             .addPageMount("/company", CompanyPage.class)

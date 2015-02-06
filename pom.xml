@@ -4,7 +4,7 @@
   <groupId>com.metrink.croquet</groupId>
   <artifactId>croquet</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>croquet</name>
   <url>http://croquet.metrink.com</url>
   <inceptionYear>2014</inceptionYear>
@@ -14,7 +14,7 @@
     <url>https://metrink.com/</url>
   </organization>
   <properties>
-    <jetty.version>9.1.5.v20140505</jetty.version>
+    <jetty.version>9.2.7.v20150116</jetty.version>
     <wicket.version>6.18.0</wicket.version>
     <hibernate.version>4.3.8.Final</hibernate.version>
     <guice.version>3.0</guice.version>
@@ -280,6 +280,12 @@
         <version>${jetty.version}</version>
         <type>jar</type>
       </dependency>
+      <!-- Jersey -->
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>2.15</version>
+      </dependency>      
       <!-- Wicket -->
       <dependency>
         <groupId>org.apache.wicket</groupId>
@@ -363,6 +369,11 @@
         <artifactId>guice-assistedinject</artifactId>
         <version>${guice.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-servlet</artifactId>
+        <version>${guice.version}</version>
+      </dependency>      
       <!-- Database Drivers -->
       <dependency>
         <groupId>org.hsqldb</groupId>

@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.WicketSettings;
 
 /**
  * An AuthenticatedWebApplication class that implements sane defaults.
@@ -55,7 +55,7 @@ public class CroquetApplication extends AuthenticatedWebApplication {
     private static final Logger LOG = LoggerFactory.getLogger(CroquetApplication.class);
 
     private final IPageFactory pageFactory;
-    private final Settings settings;
+    private final WicketSettings wicketSettings;
 
     /**
      * Constructs the CroquetApplication.
@@ -63,12 +63,12 @@ public class CroquetApplication extends AuthenticatedWebApplication {
      * Settings are injected via Guice and this application is run
      * by Jetty & Wicket.
      * @param pageFactory the page factory to use when constructing pages.
-     * @param settings settings for the application.
+     * @param wicketSettings settings for the application.
      */
     @Inject
-    public CroquetApplication(final IPageFactory pageFactory, final Settings settings) {
+    public CroquetApplication(final IPageFactory pageFactory, final WicketSettings wicketSettings) {
         this.pageFactory = pageFactory;
-        this.settings = settings;
+        this.wicketSettings = wicketSettings;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class CroquetApplication extends AuthenticatedWebApplication {
         super.init();
 
         // this is a bit of a hack to get the DebugToolbar working in deployment mode
-        if(settings.getWicketDebugToolbar() && settings.getDevelopment()) {
-            getDebugSettings().setDevelopmentUtilitiesEnabled(settings.getWicketDebugToolbar());
+        if(wicketSettings.getWicketDebugToolbar() && wicketSettings.getDevelopment()) {
+            getDebugSettings().setDevelopmentUtilitiesEnabled(wicketSettings.getWicketDebugToolbar());
             DebugBar.registerContributor(VersionDebugContributor.DEBUG_BAR_CONTRIB, this);
             DebugBar.registerContributor(InspectorDebugPanel.DEBUG_BAR_CONTRIB, this);
             DebugBar.registerContributor(SessionSizeDebugPanel.DEBUG_BAR_CONTRIB, this);
@@ -86,14 +86,14 @@ public class CroquetApplication extends AuthenticatedWebApplication {
 
 
         // check the mode we're running in and configure a few things
-        if(settings.getStatelessChecker()) {
+        if(wicketSettings.getStatelessChecker()) {
             LOG.debug("Statless checker added to application...");
             // add stateless checks if we're in dev mode
             this.getComponentPostOnBeforeRenderListeners().add(new StatelessChecker());
         }
 
         // set the render strategy for the application
-        this.getRequestCycleSettings().setRenderStrategy(settings.getRenderStrategy());
+        this.getRequestCycleSettings().setRenderStrategy(wicketSettings.getRenderStrategy());
 
         // Total hack to get wicket extensions properties to load
         final List<IInitializer> initList = new ArrayList<IInitializer>();
@@ -102,12 +102,12 @@ public class CroquetApplication extends AuthenticatedWebApplication {
         this.getResourceSettings().getStringResourceLoaders().add(new InitializerStringResourceLoader(initList));
 
         // mount all of the pages
-        for(final Map.Entry<String, Class<? extends WebPage>> page:settings.getPageMountClasses().entrySet()) {
+        for(final Map.Entry<String, Class<? extends WebPage>> page:wicketSettings.getPageMountClasses().entrySet()) {
             this.mountPage(page.getKey(), page.getValue());
         }
 
         // mount all of the resources
-        for(final Map.Entry<String, Class<? extends IResource>> page:settings.getResourceMountClasses().entrySet()) {
+        for(final Map.Entry<String, Class<? extends IResource>> page:wicketSettings.getResourceMountClasses().entrySet()) {
             this.mountResource(page.getKey(), new ResourceReference(page.getKey()) {
                 private static final long serialVersionUID = 1L;
 
@@ -124,18 +124,18 @@ public class CroquetApplication extends AuthenticatedWebApplication {
         }
 
         // set the exception page if we're in deployment and it's set
-        if(!settings.getDevelopment() && settings.getExceptionPage() != null) {
+        if(!wicketSettings.getDevelopment() && wicketSettings.getExceptionPage() != null) {
             this.getRequestCycleListeners().add(new AbstractRequestCycleListener() {
                 @Override
                 public IRequestHandler onException(final RequestCycle cycle, final Exception e) {
                     LOG.error("Returning 500: {}", e.getMessage());
-                    return new RenderPageRequestHandler(new PageProvider(settings.getExceptionPage()));
+                    return new RenderPageRequestHandler(new PageProvider(wicketSettings.getExceptionPage()));
                 }
             });
         }
 
         // should we strip wicket tags?
-        getMarkupSettings().setStripWicketTags(settings.getStripWicketTags());
+        getMarkupSettings().setStripWicketTags(wicketSettings.getStripWicketTags());
 
         // Wicket bootstrap is serving a JQuery map file, which is used to debug
         // minified JavaScript. This results in a 500 when trying to access the
@@ -147,32 +147,32 @@ public class CroquetApplication extends AuthenticatedWebApplication {
             guard.addPattern("+*.map");
         }
 
-        if(settings.getMinifyResources()) {
+        if(wicketSettings.getMinifyResources()) {
             getResourceBundles().addCssBundle(
-                    settings.getHomePageClass(),
+                    wicketSettings.getHomePageClass(),
                     "css-bundle.css",
-                    settings.getCssResourceReferences());
+                    wicketSettings.getCssResourceReferences());
 
             getResourceBundles().addJavaScriptBundle(
-                    settings.getHomePageClass(),
+                    wicketSettings.getHomePageClass(),
                     "js-bundle.js",
-                    settings.getJavaScriptResourceReferences());
+                    wicketSettings.getJavaScriptResourceReferences());
         }
 
         getHeaderContributorListenerCollection().add(new IHeaderContributor() {
             private static final long serialVersionUID = 1L;
             @Override
             public void renderHead(final IHeaderResponse response) {
-                for (final JavaScriptResourceReference resource : settings.getJavaScriptResourceReferences()) {
+                for (final JavaScriptResourceReference resource : wicketSettings.getJavaScriptResourceReferences()) {
                     response.render(JavaScriptReferenceHeaderItem.forReference(resource));
                 }
-                for (final UrlResourceReference resource : settings.getExternalJavaScriptResourceReferences()) {
+                for (final UrlResourceReference resource : wicketSettings.getExternalJavaScriptResourceReferences()) {
                     response.render(JavaScriptReferenceHeaderItem.forReference(resource));
                 }
-                for (final CssResourceReference resource : settings.getCssResourceReferences()) {
+                for (final CssResourceReference resource : wicketSettings.getCssResourceReferences()) {
                     response.render(CssReferenceHeaderItem.forReference(resource));
                 }
-                for (final UrlResourceReference resource : settings.getExternalCssResourceReferences()) {
+                for (final UrlResourceReference resource : wicketSettings.getExternalCssResourceReferences()) {
                     response.render(CssReferenceHeaderItem.forReference(resource));
                 }
             }
@@ -183,7 +183,7 @@ public class CroquetApplication extends AuthenticatedWebApplication {
 
     @Override
     public RuntimeConfigurationType getConfigurationType() {
-         return settings.getDevelopment() ? RuntimeConfigurationType.DEVELOPMENT : RuntimeConfigurationType.DEPLOYMENT;
+         return wicketSettings.getDevelopment() ? RuntimeConfigurationType.DEVELOPMENT : RuntimeConfigurationType.DEPLOYMENT;
     }
 
     @Override
@@ -201,12 +201,12 @@ public class CroquetApplication extends AuthenticatedWebApplication {
     @Override
     protected Class<? extends WebPage> getSignInPageClass() {
         // return the homepage here, should never be called
-        return settings.getLoginPageClass();
+        return wicketSettings.getLoginPageClass();
     }
 
     @Override
     public Class<? extends Page> getHomePage() {
-        return settings.getHomePageClass();
+        return wicketSettings.getHomePageClass();
     }
 
 

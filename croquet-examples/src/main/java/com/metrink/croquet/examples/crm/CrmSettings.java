@@ -1,12 +1,12 @@
 package com.metrink.croquet.examples.crm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.WicketSettings;
 
 /**
  * Custom settings file for croquet-exmaples.
  */
-public class CrmSettings extends Settings {
+public class CrmSettings extends WicketSettings {
 
     private static final long serialVersionUID = -7421676903882932579L;
 

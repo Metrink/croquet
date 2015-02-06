@@ -24,7 +24,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.UnitOfWork;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.AbstractSettings;
 
 /**
  * A PersistService, UnitOfWork, and Provider<EntityManager> implementation that configures Hibernate.
@@ -37,7 +37,9 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
     private static final String TRUE_STRING = "true";
     private static final String FALSE_STRING = "false";
 
-    private final Settings settings;
+    //CHECKSTYLE:OFF stupid stuff
+    private final AbstractSettings settings;
+    //CHECKSTYLE:ON
     private final String persistenceUnitName;
     private final ConnectionProvider connectionProvider;
     private final ThreadLocal<EntityManager> entityManager = new ThreadLocal<EntityManager>();
@@ -49,7 +51,7 @@ class CroquetPersistService implements Provider<EntityManager>, UnitOfWork, Pers
      * @param connectionProvider the {@link ConnectionProvider} to use.
      */
     @Inject
-    public CroquetPersistService(final Settings settings,
+    public CroquetPersistService(final AbstractSettings settings,
                                  @Nullable @Named("jpa-unit-name") final String persistenceUnitName,
                                  final ConnectionProvider connectionProvider) {
         this.settings = settings;

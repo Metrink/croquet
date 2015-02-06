@@ -2,14 +2,13 @@ package com.metrink.croquet;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.DispatcherType;
 
-import org.apache.wicket.guice.GuiceWebApplicationFactory;
-import org.apache.wicket.protocol.http.WicketFilter;
-import org.apache.wicket.protocol.ws.jetty9.Jetty9WebSocketFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -17,6 +16,8 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
 import org.eclipse.jetty.util.component.LifeCycle;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +26,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.persist.PersistFilter;
+import com.google.inject.servlet.GuiceFilter;
+import com.google.inject.servlet.ServletModule;
 import com.google.inject.util.Providers;
 import com.metrink.croquet.hibernate.DataSourceHibernateModule;
 import com.metrink.croquet.hibernate.PersistanceUnitHibernateModule;
 import com.metrink.croquet.hibernate.QueryRunnerModule;
-import com.metrink.croquet.inject.CroquetModule;
+import com.metrink.croquet.inject.CroquetRestModule;
 import com.metrink.croquet.modules.ManagedModule;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,14 +46,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * You must create an instance of this class to setup and run the framework.
  * @param <T> The class used when loading the settings YAML
  */
-public class Croquet<T extends Settings> {
+public class CroquetRest<T extends RestSettings> {
     protected static final EnumSet<DispatcherType> DISPATCHER_TYPES =
             EnumSet.of(DispatcherType.ASYNC,
-                      DispatcherType.REQUEST,
-                      DispatcherType.FORWARD,
-                      DispatcherType.INCLUDE);
+                       DispatcherType.REQUEST,
+                       DispatcherType.FORWARD,
+                       DispatcherType.INCLUDE);
 
-    private static final Logger LOG = LoggerFactory.getLogger(Croquet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CroquetRest.class);
 
     private volatile CroquetStatus status = CroquetStatus.STOPPED;
 
@@ -63,19 +67,19 @@ public class Croquet<T extends Settings> {
     private final ServletContextHandler sch;
 
     /**
-     * Constructs a Croquet instance given the arguments pass into the program. The {@link Settings} type T is passed
+     * Constructs a Croquet instance given the arguments pass into the program. The {@link WicketSettings} type T is passed
      * as the first argument to this constructor to avoid ugly reflection.
      *
      * @param clazz the settings class
      * @param args the arguments passed into the program.
      */
-    Croquet(final Class<T> clazz, final T settings) {
+    CroquetRest(final Class<T> clazz, final T settings) {
         this.settings = settings;
 
         sch = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
         // add the croquet module to our list of guice modules
-        guiceModules.add(new CroquetModule<T>(clazz, settings));
+        guiceModules.add(new CroquetRestModule<T>(clazz, settings));
 
         // The user can pick between: no db, a persistence.xml file, or using application.yml file.
         // If you're not using a db, then we skip this.
@@ -105,6 +109,18 @@ public class Croquet<T extends Settings> {
             protected void configure() {
                 bind(String.class).annotatedWith(Names.named("jpa-unit-name"))
                                   .toProvider(getPUNameProvider());
+            }
+        });
+
+        guiceModules.add(new ServletModule() {
+            @Override
+            protected void configureServlets() {
+                final Map<String, String> params = new HashMap<String, String>();
+
+                params.put(ServerProperties.PROVIDER_PACKAGES, "com.metrink.api");
+
+                bind(ServletContainer.class).in(Singleton.class);
+                serve("/*").with(ServletContainer.class, params);
             }
         });
     }
@@ -294,6 +310,7 @@ public class Croquet<T extends Settings> {
     protected Server configureJetty(final int port) {
         final Server server = new Server();
         final ServerConnector connector = new ServerConnector(server);
+        final ServletContextHandler sch = getServletContextHandler();
 
         // TODO: make all of this configurable
         connector.setIdleTimeout((int)TimeUnit.HOURS.toMillis(1));
@@ -303,44 +320,29 @@ public class Croquet<T extends Settings> {
         server.addConnector(connector);
 
         // set the injector as an attribute in the context
-        sch.setAttribute("guice-injector", injector);
+        sch.setAttribute("guice-injector", getInjector());
 
         // prevent the JSESSIONID from getting set via a URL argument
         sch.setInitParameter("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");
 
-        // add the font mime type by default
-        sch.getMimeTypes().addMimeMapping("woff", "application/x-font-woff");
-
         // if we're using a database, then install the filter
         if(!settings.getDatabaseSettings().getNotUsed()) {
             // setup a FilterHolder for the Guice Persistence
-            final FilterHolder persistFilter = new FilterHolder(injector.getInstance(PersistFilter.class));
+            final FilterHolder persistFilter = new FilterHolder(getInjector().getInstance(PersistFilter.class));
 
             // add the filter to the context
             sch.addFilter(persistFilter, "/*", DISPATCHER_TYPES);
         }
 
-        // setup a FilterHolder for WebSockets
-        final FilterHolder webSocketFilter = new FilterHolder(Jetty9WebSocketFilter.class);
+        // configure a FilterHolder for Guice
+        final FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
 
-        // set the app factor as the Guice Web App Factory
-        webSocketFilter.setInitParameter("applicationFactoryClassName", GuiceWebApplicationFactory.class.getName());
+        sch.addFilter(filterHolder, "/*", DISPATCHER_TYPES);
+        sch.addServlet(DefaultServlet.class, "/*");
 
-        // tell the filter to use the injector in the context instead of making a new one
-        webSocketFilter.setInitParameter("injectorContextAttribute", "guice-injector");
-
-        // setup the filter mapping
-        webSocketFilter.setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, "/*");
-
-        webSocketFilter.setInitParameter("configuration", "deployment");
-
-        // add the filter to the context
-        sch.addFilter(webSocketFilter, "/*", DISPATCHER_TYPES);
-
-        // add the default servlet as Guice & Wicket will take care of everything for us
-        sch.addServlet(DefaultServlet.class,  "/*");
-
+        //server.setDumpAfterStart(true);
         server.setHandler(sch);
+
 
         return server;
     }

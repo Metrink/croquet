@@ -43,10 +43,19 @@ public class DataSourceFactory implements Serializable {
             dataSource.setUrl(dbSettings.getJdbcUrl());
             dataSource.setUsername(dbSettings.getUser());
             dataSource.setPassword(dbSettings.getPass());
+
+            dataSource.setMaxActive(dbSettings.getMaxActive());
+            dataSource.setMaxIdle(dbSettings.getMaxIdle());
+            dataSource.setMinIdle(dbSettings.getMinIdle());
+            dataSource.setInitialSize(dbSettings.getInitialSize());
+            dataSource.setTestOnBorrow(dbSettings.getTestOnBorrow());
+            dataSource.setTestOnReturn(dbSettings.getTestOnReturn());
+            dataSource.setTestWhileIdle(dbSettings.getTestWhileIdle());
+            dataSource.setValidationQuery(dbSettings.getValidationQuery());
+            dataSource.setLogValidationErrors(dbSettings.getLogValidationErrors());
+
+            // a catch-all for any other properties that are needed
             dataSource.setDbProperties(dbSettings.getProperties());
-            dataSource.setTestOnBorrow(true);
-            dataSource.setTestWhileIdle(true);
-            dataSource.setValidationQuery("select 1");
         }
 
         return dataSource;

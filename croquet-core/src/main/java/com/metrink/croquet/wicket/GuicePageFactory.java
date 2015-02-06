@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
-import com.metrink.croquet.Settings;
+import com.metrink.croquet.WicketSettings;
 
 /**
  * An implementation of an {@link IPageFactory} that uses Guice to create the page instances.
@@ -37,7 +37,7 @@ public class GuicePageFactory implements IPageFactory {
     public static final Logger LOG = LoggerFactory.getLogger(GuicePageFactory.class);
 
     private final Injector injector;
-    private final Settings settings;
+    private final WicketSettings wicketSettings;
 
     private final ConcurrentMap<String, Boolean> pageToBookmarkableCache = Generics.newConcurrentHashMap();
 
@@ -48,7 +48,7 @@ public class GuicePageFactory implements IPageFactory {
     @Inject
     public GuicePageFactory(final Injector injector) {
         this.injector = injector;
-        this.settings = injector.getInstance(Settings.class);
+        this.wicketSettings = injector.getInstance(WicketSettings.class);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class GuicePageFactory implements IPageFactory {
         LOG.debug("Creating new {} page without parameters", pageClass.getName());
 
         if (!Application.get().getSecuritySettings().getAuthorizationStrategy().isInstantiationAuthorized(pageClass)) {
-            throw new RestartResponseAtInterceptPageException(settings.getLoginPageClass());
+            throw new RestartResponseAtInterceptPageException(wicketSettings.getLoginPageClass());
         }
 
         try {
