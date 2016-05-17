@@ -112,12 +112,24 @@ public class CroquetRest<T extends RestSettings> {
             }
         });
 
+        // make sure we have at least one package
+        if(settings.getProviderPackages().isEmpty()) {
+            throw new RuntimeException("No provider packages specified");
+        }
+
         guiceModules.add(new ServletModule() {
             @Override
             protected void configureServlets() {
+                final StringBuilder sb = new StringBuilder();
+
+                for(String path:settings.getProviderPackages()) {
+                    sb.append(path);
+                    sb.append(";");
+                }
+
                 final Map<String, String> params = new HashMap<String, String>();
 
-                params.put(ServerProperties.PROVIDER_PACKAGES, "com.metrink.api");
+                params.put(ServerProperties.PROVIDER_PACKAGES, sb.toString());
 
                 bind(ServletContainer.class).in(Singleton.class);
                 serve("/*").with(ServletContainer.class, params);
